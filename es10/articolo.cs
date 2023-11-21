@@ -10,10 +10,10 @@ namespace es10
     {
         public string Codice { get; set; }  
         public string Descrizione { get; set; }
-        public decimal PrezzoUnitario { get; set; } 
+        public double PrezzoUnitario { get; set; } 
         public bool TesseraFedelta { get; set; }    
 
-        public articolo(string codice, string descrizione, decimal prezzoUnitario)
+        public articolo(string codice, string descrizione, double prezzoUnitario)
         {
             Codice = codice;
             Descrizione = descrizione;
@@ -39,18 +39,54 @@ namespace es10
             AnnoScadenza = annoScadenza;
         }
 
-        public override void Sconta()
+        public override double Sconta()
         {
-            base.Sconta();  
+            if (AnnoScadenza == DateTime.Now.Year && TesseraFedelta)
+            {
+                return PrezzoUnitario - base.Sconta() * (20 / 100);
+            }
+            if(AnnoScadenza== DateTime.Now.Year && TesseraFedelta)
+            {
+                return PrezzoUnitario - PrezzoUnitario * (20 / 100);
+            }
+            if (TesseraFedelta)
+            {
+                base.Sconta();
+            }
+            return PrezzoUnitario;
         }
     }
 
     class ArticoloAlimentareFresco : ArticoloAlimentare
     {
         public int GiorniDopoApertura { get; set; }
-        public ArticoloAlimentareFresco(string codice, string descrizione, decimal prezzoUnitario, int annoScadenza,int GiorniDopoApertura): base (codice, descrizione, prezzoUnitario)
+        public ArticoloAlimentareFresco(string codice, string descrizione, decimal prezzoUnitario, int annoScadenza,int giorniDopoApertura): base (codice, descrizione, prezzoUnitario,annoScadenza)
+        {
+            GiorniDopoApertura = giorniDopoApertura;
+        }
+
+        public override void Sconta()
         {
 
         }
+
     }
+
+    class ArticoloNonAlimentare : articolo
+    {
+        public string Materiale { get; set; }
+        public bool Riciclabile { get; set; }
+
+        public ArticoloNonAlimentare(string codice, string descrizione, decimal prezzoUnitario,string materiale, bool riciclabile):base(codice, descrizione, prezzoUnitario)
+        {
+            Materiale= materiale;
+            Riciclabile = riciclabile;
+        }
+
+        public override void Sconta()
+        {
+            base.Sconta();
+        }
+
+    } 
 }
