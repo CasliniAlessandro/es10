@@ -34,7 +34,7 @@ namespace es10
     class ArticoloAlimentare : articolo
     {
         public int AnnoScadenza { get; set; }   
-        public ArticoloAlimentare(string codice, string descrizione, decimal prezzoUnitario,int annoScadenza) : base(codice,descrizione,prezzoUnitario)
+        public ArticoloAlimentare(string codice, string descrizione, double prezzoUnitario,int annoScadenza) : base(codice,descrizione,prezzoUnitario)
         {
             AnnoScadenza = annoScadenza;
         }
@@ -60,14 +60,20 @@ namespace es10
     class ArticoloAlimentareFresco : ArticoloAlimentare
     {
         public int GiorniDopoApertura { get; set; }
-        public ArticoloAlimentareFresco(string codice, string descrizione, decimal prezzoUnitario, int annoScadenza,int giorniDopoApertura): base (codice, descrizione, prezzoUnitario,annoScadenza)
+        public ArticoloAlimentareFresco(string codice, string descrizione, double prezzoUnitario, int annoScadenza,int giorniDopoApertura): base (codice, descrizione, prezzoUnitario,annoScadenza)
         {
             GiorniDopoApertura = giorniDopoApertura;
         }
 
-        public override void Sconta()
+        public override double Sconta()
         {
-
+            double x = base.Sconta();
+            double psconto = 10F;
+            for(int i=1;i<6&&i<AnnoScadenza;i++) 
+            {
+                psconto -= 2F;
+            }
+            return x-x*psconto/100;
         }
 
     }
@@ -77,15 +83,28 @@ namespace es10
         public string Materiale { get; set; }
         public bool Riciclabile { get; set; }
 
-        public ArticoloNonAlimentare(string codice, string descrizione, decimal prezzoUnitario,string materiale, bool riciclabile):base(codice, descrizione, prezzoUnitario)
+        public ArticoloNonAlimentare(string codice, string descrizione, double prezzoUnitario,string materiale, bool riciclabile):base(codice, descrizione, prezzoUnitario)
         {
             Materiale= materiale;
             Riciclabile = riciclabile;
         }
 
-        public override void Sconta()
+        public override double Sconta()
         {
-            base.Sconta();
+            if(TesseraFedelta&&Riciclabile) 
+            {
+                return PrezzoUnitario - base.Sconta() * 10 / 100;
+
+            }
+            if(Riciclabile&& TesseraFedelta == false)
+            {
+                PrezzoUnitario = PrezzoUnitario - PrezzoUnitario * 10 / 100;
+            }
+            if (TesseraFedelta)
+            {
+                base.Sconta();
+            }
+            return PrezzoUnitario;
         }
 
     } 
